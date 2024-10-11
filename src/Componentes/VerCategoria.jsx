@@ -4,43 +4,42 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner';
 
-export default function VerGastos() {
-    const [gastos, setGastos] = useState([]);
+import React from 'react'
+
+function VerCategoria() 
+{
+    const [categorias, setCategorias] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [respuesta, setRespuesta] = useState('');
     const [respuestaError, setRespuestaError] = useState(false);
+    
+    useEffect (() => {
+            traerCategorias()
+        }, []);
 
-    useEffect(() => {
-        traerGastos();
-    }, []);
-
-    const traerGastos = async () => {
+    const traerCategorias = async () => {
         setCargando(true);
         try {
-            const response = await axios.get('http://localhost:8000/gastos');
-            if (Array.isArray(response.data)) {
-                setGastos(response.data);
-            } else {
-                throw new Error('Datos inválidos');
-            }
+            const response = await axios.get('http://localhost:8000/categorias');
+            setCategorias(response.data);
+            setCargando(false);
         } catch (error) {
-            console.error('Error:', error);
-            setRespuesta(`Error al obtener gastos: ${error.response?.data || error.message}`);
             setRespuestaError(true);
-        } finally {
+            setRespuesta('Hubo un error al cargar las categorías');
             setCargando(false);
         }
-    };
+    }
 
-    const handleRefresh = () => {
-        setGastos([]);
+    const handleRefresh = () => 
+    {
+        setCategorias([]);
         setRespuesta('');
         setRespuestaError(false);
-        traerGastos();
-    };
-
-    return (
-        <div className="container mt-5">
+        traerCategorias();
+    }
+    
+      return (
+        <div className='container mt-5'>
             {cargando ? (
             <div className="spinner-container-list">
                 <Spinner animation="border" size="lg" />
@@ -55,24 +54,20 @@ export default function VerGastos() {
                             <tr>
                                 <th>#</th>
                                 <th>Nombre</th>
-                                <th>Valor</th>
-                                <th>Fecha</th>
                                 <th>Descripción</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {gastos.map((gasto, index) => (
+                            {Categoria.map((categoria, index) => (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
-                                    <td>{gasto.nombre}</td>
-                                    <td>{gasto.monto}</td>
-                                    <td>{gasto.fecha}</td>
-                                    <td>{gasto.descripcion}</td>
+                                    <td>{categoria.nombre}</td>
+                                    <td>{categoria.descripcion}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
-                    {!gastos.length && <p>No se encontraron gastos.</p>}
+                    {!categoria.length && <p>No se encontraron categorias.</p>}
                 </>
             )}
             {respuesta && !respuestaError && (
@@ -81,6 +76,10 @@ export default function VerGastos() {
             <Button variant="outline-secondary" className='refrescar'  onClick={handleRefresh} >
                 Refrescar
             </Button>
+
         </div>
-    );
+      )
+    
 }
+
+export default VerCategoria
